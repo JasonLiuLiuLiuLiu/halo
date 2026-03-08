@@ -1,6 +1,6 @@
 plugins {
-    id "org.springframework.boot" version "2.5.12"
-    id "io.spring.dependency-management" version "1.0.11.RELEASE"
+    id "org.springframework.boot" version "2.7.18"
+    id "io.spring.dependency-management" version "1.0.15.RELEASE"
     id "checkstyle"
     id "java"
 }
@@ -37,10 +37,14 @@ configurations {
 }
 
 configurations.all {
-    // Aligning log4j dependency versions to 2.17.1
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        // Aligning log4j dependency versions to 2.23.1
         if (details.requested.group == 'org.apache.logging.log4j') {
-            details.useVersion '2.17.1'
+            details.useVersion '2.23.1'
+        }
+        // Aligning snakeyaml to secure version (CVE-2022-1471)
+        if (details.requested.group == 'org.yaml' && details.requested.name == 'snakeyaml') {
+            details.useVersion '1.33'
         }
     }
 }
@@ -61,21 +65,21 @@ ext {
     qcloudSdkVersion = '5.6.61'
     minioSdkVersion = '7.1.4'
     swaggerVersion = "3.0.0"
-    commonsFileUploadVersion = "1.4"
+    commonsFileUploadVersion = "1.5"
     commonsLangVersion = '3.12.0'
     httpclientVersion = '4.5.13'
-    jgitVersion = "5.9.0.202009080501-r"
+    jgitVersion = "5.13.3.202401111512-r"
     flexmarkVersion = "0.62.2"
     thumbnailatorVersion = '0.4.14'
     image4jVersion = "0.7zensight1"
-    flywayVersion = "7.15.0"
-    h2Version = "1.4.199"
+    flywayVersion = "8.5.13"
+    h2Version = "2.2.224"
     levelDbVersion = "0.12"
     annotationsVersion = "3.0.1u2"
     zxingVersion = '3.4.1'
     huaweiObsVersion = '3.21.4'
     templateInheritanceVersion = "0.4.RELEASE"
-    jsoupVersion = '1.14.3'
+    jsoupVersion = '1.17.2'
     embeddedRedisVersion = '0.6'
     diffUtilsVersion = '4.11'
     commonsImagingVersion = "1.0-alpha3"
@@ -135,7 +139,7 @@ dependencies {
 
     implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
     runtimeOnly "com.h2database:h2:$h2Version"
-    runtimeOnly "mysql:mysql-connector-java"
+    runtimeOnly "mysql:mysql-connector-java:8.0.33"
 
     compileOnly "org.projectlombok:lombok"
     annotationProcessor "org.projectlombok:lombok"

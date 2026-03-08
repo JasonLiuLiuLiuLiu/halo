@@ -11,7 +11,7 @@ spring:
       enabled: always
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:h2:mem:halo-test
+    url: jdbc:h2:mem:halo-test;MODE=LEGACY;NON_KEYWORDS=USER,VALUE
   h2:
     console:
       enabled: false

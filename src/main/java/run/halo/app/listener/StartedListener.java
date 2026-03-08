@@ -108,9 +108,32 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
 
     /**
      * Migrate database.
+     * Note: Migration scripts use MySQL-specific syntax (ALTER TABLE MODIFY) which is
+     * incompatible with H2 2.x. Skip Flyway for H2 databases since schema is managed
+     * by Hibernate ddl-auto.
      */
     private void migrate() throws SQLException {
         log.info("Starting migrate database...");
+
+        // Skip Flyway migration for H2 databases since migration scripts use MySQL syntax
+        if (url != null && url.startsWith("jdbc:h2:")) {
+            log.info("H2 database detected, skipping Flyway migration (schema managed by Hibernate).");
+            // Still detect database product name
+            Flyway flyway = Flyway
+                .configure()
+                .locations("classpath:/migration")
+                .baselineVersion("1")
+                .baselineOnMigrate(true)
+                .dataSource(url, username, password)
+                .load();
+            Connection connection =
+                flyway.getConfiguration().getDataSource().getConnection();
+            DatabaseMetaData databaseMetaData = JdbcUtils.getDatabaseMetaData(connection);
+            HaloConst.DATABASE_PRODUCT_NAME = databaseMetaData.getDatabaseProductName() + " "
+                + databaseMetaData.getDatabaseProductVersion();
+            connection.close();
+            return;
+        }
 
         Flyway flyway = Flyway
             .configure()
